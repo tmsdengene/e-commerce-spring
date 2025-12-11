@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: ecomerce
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+
+  datasource:
+    url: jdbc:postgresql://172.18.112.1:5432/ecomercedb
+    username: postgres
+    password: yegna@2025
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  servlet:
+    context-path: /api/v1/
+  port: 8082
+
+springdoc:
+  default-consumes-media-type: application/json
+  
+# File upload size configuration
+
+
+application:
+  security:
+    jwt:
+      secret-key: a460a1b6e08be075173bb918cfe747900016aabe1d55e8b065c1bf588f401b98
+      expiration: 86400000
+      refresh-token-expiration: 604800000 # 7 days in milliseconds
+    cors:
+      allowed-origins: http://localhost:3000

@@ -1,0 +1,116 @@
+# Java / JVM
+*.class
+*.log
+*.ctxt
+hs_err_pid*
+replay_pid*
+
+# Packaged binaries (keep wrapper jar allowed below)
+*.jar
+*.war
+*.ear
+
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.properties.backup
+
+# Gradle (if accidentally added)
+.gradle/
+build/
+**/build/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# Eclipse / STS
+.project
+.classpath
+.settings/
+.springBeans
+.apt_generated/
+.factorypath
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# VS Code
+.vscode/
+.history/
+
+# OS generated
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Icon?
+.Spotlight-V100
+.Trashes
+
+# Logs & Reports
+*.log
+*.log.*
+/logs/
+**/logs/
+*.out
+*.err
+
+# Environment & Secrets
+.env
+.env.*
+*.env
+application-local.yml
+application-local.properties
+
+# Spring Boot specific
+spring.log
+
+# Uploads and runtime data
+/uploads/
+/uploads/**
+
+# Cache / Temp
+**/.cache/
+**/.temp/
+.tmp/
+*.swp
+*.swo
+
+# Node (if frontend or tooling present)
+node_modules/
+
+# Coverage / Test outputs
+coverage/
+**/surefire-reports/
+**/failsafe-reports/
+
+# Docker
+*.pid
+**/.docker/**
+
+# OS trash
+*.orig
+
+# IDE misc
+*.idea/**/workspace.xml
+*.idea/**/tasks.xml
+*.idea/**/usage.statistics.xml
+*.idea/**/dictionaries
+*.idea/**/libraries
+
+# Git
+.git-credentials
+
+# Local tooling
+.postman/**
+postman/**
+postman_environment.json
