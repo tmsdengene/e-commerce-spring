@@ -1,0 +1,442 @@
+{
+  "info": {
+    "_postman_id": "d8b6f9d8-2d63-44c7-8f70-6f1ee7b2c001",
+    "name": "E-Commerce Spring API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for the e-commerce-spring backend (Auth, Products, Categories, Cart, Orders, Payment, Checkout). Includes variables, auth pre-request script, and example payloads."
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8082", "type": "string" },
+    { "key": "apiVersion", "value": "/api/v1", "type": "string" },
+    { "key": "accessToken", "value": "", "type": "string" },
+    { "key": "refreshToken", "value": "", "type": "string" },
+    { "key": "userId", "value": "", "type": "string" }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Attach Bearer token automatically if available",
+          "const token = pm.collectionVariables.get('accessToken') || pm.environment.get('accessToken') || pm.variables.get('accessToken');",
+          "if (token) {",
+          "  pm.request.headers.upsert({ key: 'Authorization', value: `Bearer ${token}` });",
+          "}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "auth", "login" ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Login returns token', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('token');",
+                  "  pm.expect(json).to.have.property('refreshToken');",
+                  "  // Save tokens and user info",
+                  "  pm.collectionVariables.set('accessToken', json.token);",
+                  "  pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "  if (json.user && json.user.id) { pm.collectionVariables.set('userId', json.user.id); }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "auth", "register" ]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Jane Doe\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh-token",
+              "host": [ "{{baseUrl}}" ],
+              "path": [ "auth", "refresh-token" ]
+            },
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Refresh returns new access token', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.property('token');",
+                  "  pm.collectionVariables.set('accessToken', json.token);",
+                  "  if (json.refreshToken) pm.collectionVariables.set('refreshToken', json.refreshToken);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "url": { "raw": "{{baseUrl}}/auth/logout", "host": ["{{baseUrl}}"], "path": ["auth", "logout"] },
+            "body": { "mode": "raw", "raw": "{\n  \"token\": \"{{accessToken}}\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Validate Token",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/validate-token?token={{accessToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "validate-token"],
+              "query": [ { "key": "token", "value": "{{accessToken}}" } ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Extract User ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/user-id?token={{accessToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "user-id"],
+              "query": [ { "key": "token", "value": "{{accessToken}}" } ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Products (paged)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["products"],
+              "query": [
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Search Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/search?name=iPhone&category=Electronics&minPrice=500&maxPrice=1500&page=0&size=10&sortBy=price&sortDir=asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "search"],
+              "query": [
+                {"key": "name", "value": "iPhone"},
+                {"key": "category", "value": "Electronics"},
+                {"key": "minPrice", "value": "500"},
+                {"key": "maxPrice", "value": "1500"},
+                {"key": "page", "value": "0"},
+                {"key": "size", "value": "10"},
+                {"key": "sortBy", "value": "price"},
+                {"key": "sortDir", "value": "asc"}
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/products/{{productId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["products", "{{productId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Product (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}/products", "host": ["{{baseUrl}}"], "path": ["products"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Product\",\n  \"categoryId\": 1,\n  \"price\": 99.99,\n  \"stockQuantity\": 100,\n  \"description\": \"Product description\",\n  \"imageUrl\": \"/uploads/products/image.jpg\",\n  \"weight\": \"500g\",\n  \"size\": \"10x10x10\",\n  \"color\": \"Red\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Product (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}/products/{{productId}}", "host": ["{{baseUrl}}"], "path": ["products", "{{productId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Product\",\n  \"categoryId\": 1,\n  \"price\": 89.99,\n  \"stockQuantity\": 80,\n  \"description\": \"Updated description\",\n  \"imageUrl\": \"/uploads/products/image.jpg\",\n  \"weight\": \"500g\",\n  \"size\": \"10x10x10\",\n  \"color\": \"Blue\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Deactivate Product (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/products/{{productId}}/deactivate", "host": ["{{baseUrl}}"], "path": ["products", "{{productId}}", "deactivate"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Product (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/products/{{productId}}", "host": ["{{baseUrl}}"], "path": ["products", "{{productId}}"] }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Product Image (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/products/upload-image", "host": ["{{baseUrl}}"], "path": ["products", "upload-image"] },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": [] }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get Categories (paged)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/categories?page=0&size=10", "host": ["{{baseUrl}}"], "path": ["categories"], "query": [ {"key": "page", "value": "0"}, {"key": "size", "value": "10"} ] }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Category by ID",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/categories/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["categories", "{{categoryId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Create Category (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}/categories", "host": ["{{baseUrl}}"], "path": ["categories"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"New Category\",\n  \"description\": \"Category description\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Category (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}/categories/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["categories", "{{categoryId}}"] },
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Category\",\n  \"description\": \"Updated description\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Category (Admin)",
+          "request": { "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}/categories/{{categoryId}}", "host": ["{{baseUrl}}"], "path": ["categories", "{{categoryId}}"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}{{apiVersion}}/cart", "host": ["{{baseUrl}}"], "path": ["api", "v1", "cart"], "variable": [], "query": [] } },
+          "response": []
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}{{apiVersion}}/cart/add", "host": ["{{baseUrl}}"], "path": ["api", "v1", "cart", "add"] },
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": 1,\n  \"quantity\": 2\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PUT",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}{{apiVersion}}/cart/update", "host": ["{{baseUrl}}"], "path": ["api", "v1", "cart", "update"] },
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": 1,\n  \"quantity\": 3\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}{{apiVersion}}/cart/remove", "host": ["{{baseUrl}}"], "path": ["api", "v1", "cart", "remove"] },
+            "body": { "mode": "raw", "raw": "{\n  \"productId\": 1\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Clear Cart",
+          "request": { "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}{{apiVersion}}/cart/clear", "host": ["{{baseUrl}}"], "path": ["api", "v1", "cart", "clear"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}{{apiVersion}}/orders/create", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders", "create"] },
+            "body": { "mode": "raw", "raw": "{\n  \"shippingAddress\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zip\": \"10001\",\n    \"country\": \"USA\"\n  },\n  \"billingAddress\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zip\": \"10001\",\n    \"country\": \"USA\"\n  },\n  \"paymentMethod\": \"CREDIT_CARD\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Order by UUID",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}{{apiVersion}}/orders/{{orderUuid}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders", "{{orderUuid}}"] } },
+          "response": []
+        },
+        {
+          "name": "Update Order Status (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}{{apiVersion}}/orders/update-status", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders", "update-status"] },
+            "body": { "mode": "raw", "raw": "{\n  \"orderUuid\": \"{{orderUuid}}\",\n  \"status\": \"SHIPPED\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Cancel Order",
+          "request": { "method": "DELETE", "header": [], "url": { "raw": "{{baseUrl}}{{apiVersion}}/orders/cancel/{{orderUuid}}", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders", "cancel", "{{orderUuid}}"] } },
+          "response": []
+        },
+        {
+          "name": "Get Order History",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}{{apiVersion}}/orders/history", "host": ["{{baseUrl}}"], "path": ["api", "v1", "orders", "history"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "header": [ {"key": "Content-Type", "value": "application/json"} ],
+            "url": { "raw": "{{baseUrl}}/api/payment/initiate", "host": ["{{baseUrl}}"], "path": ["api", "payment", "initiate"] },
+            "body": { "mode": "raw", "raw": "{\n  \"orderId\": 1,\n  \"amount\": 1999.98,\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"cardNumber\": \"4111111111111111\",\n  \"expiryDate\": \"12/25\",\n  \"cvv\": \"123\"\n}" }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payment by Order",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/payment/order/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["api", "payment", "order", "{{orderId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Get Latest Payment for User",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/payment/user/latest", "host": ["{{baseUrl}}"], "path": ["api", "payment", "user", "latest"] } },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Checkout",
+      "item": [
+        {
+          "name": "Checkout",
+          "request": { "method": "POST", "header": [], "url": { "raw": "{{baseUrl}}/api/checkout/{{orderId}}?paymentMethod=CREDIT_CARD", "host": ["{{baseUrl}}"], "path": ["api", "checkout", "{{orderId}}"], "query": [ {"key": "paymentMethod", "value": "CREDIT_CARD"} ] } },
+          "response": []
+        },
+        {
+          "name": "Get Checkout by Order",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/checkout/order/{{orderId}}", "host": ["{{baseUrl}}"], "path": ["api", "checkout", "order", "{{orderId}}"] } },
+          "response": []
+        },
+        {
+          "name": "Get Latest Checkout for User",
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/api/checkout/user/{{userId}}/latest", "host": ["{{baseUrl}}"], "path": ["api", "checkout", "user", "{{userId}}", "latest"] } },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
