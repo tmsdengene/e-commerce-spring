@@ -10,15 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/checkout")
+@RequestMapping("/checkout")
 public class CheckoutController {
     @Autowired
     private CheckoutService checkoutService;
 
     @PostMapping("/{orderId}")
     public ResponseEntity<CheckoutDTO> checkout(@PathVariable Long orderId,
-                                                @RequestParam String paymentMethod,
-                                                Authentication authentication) {
+            @RequestParam String paymentMethod,
+            Authentication authentication) {
         // Get logged-in user from authentication principal
         User user = (User) authentication.getPrincipal();
         Order order = new Order();

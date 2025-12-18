@@ -9,14 +9,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/orders")
+@RequestMapping("orders")
 public class OrderController {
     @Autowired
     private OrderService orderService;
 
     @PostMapping("/create")
     public ResponseEntity<OrderDTO> createOrder(Authentication authentication,
-                                                @RequestBody CreateOrderRequest request) {
+            @RequestBody CreateOrderRequest request) {
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(orderService.createOrder(user, request));
     }

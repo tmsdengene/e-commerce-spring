@@ -10,7 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/cart")
+@RequestMapping("cart")
 public class CartController {
     @Autowired
     private CartService cartService;
@@ -23,21 +23,21 @@ public class CartController {
 
     @PostMapping("/add")
     public ResponseEntity<CartDTO> addItem(Authentication authentication,
-                                           @RequestBody AddCartItemRequest request) {
+            @RequestBody AddCartItemRequest request) {
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(cartService.addItemToCart(user, request));
     }
 
     @PutMapping("/update")
     public ResponseEntity<CartDTO> updateItem(Authentication authentication,
-                                              @RequestBody UpdateCartItemRequest request) {
+            @RequestBody UpdateCartItemRequest request) {
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(cartService.updateCartItem(user, request));
     }
 
     @DeleteMapping("/remove")
     public ResponseEntity<CartDTO> removeItem(Authentication authentication,
-                                              @RequestBody RemoveCartItemRequest request) {
+            @RequestBody RemoveCartItemRequest request) {
         User user = (User) authentication.getPrincipal();
         return ResponseEntity.ok(cartService.removeCartItem(user, request));
     }

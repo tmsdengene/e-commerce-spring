@@ -11,7 +11,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.servers.Server;
 
 @OpenAPIDefinition(info = @Info(contact = @Contact(name = "TMS", email = "temesgenma@dengene.com"), title = "Exam Management System", version = "1.0", description = "API for Exam Management System", license = @License(name = "Apache 2.0", url = "http://www.apache.org/licenses/LICENSE-2.0.html"), termsOfService = "http://swagger.io/terms/"), servers = {
-                @Server(url = "http://localhost:8585/api/v1", description = "Local server"),
+                @Server(url = "http://localhost:8082/api/v1/", description = "Local server"),
 }, security = {
                 @SecurityRequirement(name = "bearerAuth")
 })

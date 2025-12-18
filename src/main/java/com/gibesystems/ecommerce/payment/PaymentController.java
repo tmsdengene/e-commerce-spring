@@ -10,14 +10,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("payment")
 public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
     @PostMapping("/initiate")
     public ResponseEntity<PaymentResponse> initiatePayment(@RequestBody PaymentRequest request,
-                                                          Authentication authentication) {
+            Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         PaymentResponse response = paymentService.initiatePayment(user, request);
         return ResponseEntity.ok(response);

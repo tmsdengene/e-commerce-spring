@@ -28,7 +28,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-
 import javax.security.auth.Subject;
 
 @Getter
@@ -43,8 +42,10 @@ public class User implements UserDetails, Principal {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    /* @Column(nullable = false)
-     private String name;*/
+    /*
+     * @Column(nullable = false)
+     * private String name;
+     */
     @Column(nullable = false)
     private String firstName;
     @Column(nullable = false)
@@ -63,7 +64,6 @@ public class User implements UserDetails, Principal {
     private boolean accountLocked;
     private boolean enabled;
 
-
     @CreationTimestamp
     private LocalDateTime createdAt;
 
@@ -80,16 +80,16 @@ public class User implements UserDetails, Principal {
         return Principal.super.implies(subject);
     }
 
-
-    /* public Collection<? extends GrantedAuthority> getAuthorities() {
-         return java.util.Collections.singletonList(new SimpleGrantedAuthority(role.name()));
-     }
- */
+    /*
+     * public Collection<? extends GrantedAuthority> getAuthorities() {
+     * return java.util.Collections.singletonList(new
+     * SimpleGrantedAuthority(role.name()));
+     * }
+     */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + role.name())
-        );
+                new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class User implements UserDetails, Principal {
 
     @Override
     public boolean isAccountNonLocked() {
-        return accountLocked;
+        return !accountLocked;
     }
 
     @Override
@@ -117,7 +117,7 @@ public class User implements UserDetails, Principal {
         return enabled;
     }
 
-    //implement get fullname
+    // implement get fullname
     public String getFullName() {
         return firstName + " " + lastName;
     }

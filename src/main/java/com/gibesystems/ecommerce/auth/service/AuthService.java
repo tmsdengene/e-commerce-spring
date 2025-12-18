@@ -40,16 +40,11 @@ public class AuthService {
         log.info("Login attempt for email: {}", request.getEmail());
 
         var authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         User user = (User) authentication.getPrincipal();
         // User user = userRepository.findByEmail(request.getEmail())
-        //         .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BadCredentialsException("Invalid email or password");
-        }
+        // .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
 
         String token = jwtService.generateToken(user, user.getFullName(), user.getEmail());
         String refreshToken = jwtService.generateRefreshToken(user);
@@ -83,7 +78,6 @@ public class AuthService {
                 .accountLocked(false)
                 .build();
 
-       
         User savedUser = userRepository.save(user);
         log.info("User {} registered successfully", savedUser.getEmail());
 
@@ -115,5 +109,4 @@ public class AuthService {
         return jwtService.getUserIdFromToken(token);
     }
 
- 
 }

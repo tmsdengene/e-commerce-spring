@@ -7,9 +7,9 @@ spring:
       max-request-size: 20MB
 
   datasource:
-    url: jdbc:postgresql://172.18.112.1:5432/ecomercedb
+    url: jdbc:postgresql://localhost:5432/ecomercedb
     username: postgres
-    password: yegna@2025
+    password: YOUR_DB_PASSWORD
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -39,4 +39,4 @@ application:
       expiration: 86400000
       refresh-token-expiration: 604800000 # 7 days in milliseconds
     cors:
-      allowed-origins: http://localhost:3000
+      allowed-origins: http://localhost:4200
