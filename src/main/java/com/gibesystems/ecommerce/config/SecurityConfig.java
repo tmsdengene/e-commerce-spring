@@ -43,7 +43,8 @@ public class SecurityConfig {
                         "/webjars/**",
                         "/swagger-ui.html",
                         "/actuator/health",
-                        "/actuator/info").permitAll()
+                        "/actuator/info",
+                        "/uploads/**").permitAll()
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .requestMatchers("/api/questions/**").hasRole("ADMIN")
                         .anyRequest()
